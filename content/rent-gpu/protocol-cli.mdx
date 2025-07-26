@@ -1,0 +1,806 @@
+import { Callout } from "nextra/components";
+
+# Spheron Protocol CLI
+
+Explore detailed steps and options of the Spheron Protocol CLI. In this guide we will define each environment variable and use within each command.
+
+## Install Spheron Protocol CLI (Linux, MacOS & Windows)
+
+### Prerequisites
+
+To install Spheron Protocol CLI using the script, make sure you have [`curl`](https://curl.se/) installed on your system. To check quickly:
+
+```sh
+curl --version
+```
+
+### Install Spheron Protocol CLI
+
+1. To install the Spheron Protocol CLI on the system, just run this one command in your terminal and pass the password during the prompt:
+
+```sh
+curl -sL1 https://sphnctl.sh | bash
+```
+
+2. Verify Spheron Installation
+
+```sh
+# Verify the installation by using a simple command to check the Spheron version
+sphnctl -h
+```
+
+## Wallet Configurations
+
+### Creating a Wallet
+
+To create a new wallet, start by configuring the name of your key. Run the command below, replacing `[wallet name]` with a name of your choice:
+
+```sh
+sphnctl wallet create --name [Wallet Name]
+```
+
+**Example:**
+
+```sh
+sphnctl wallet create --name wallet
+```
+
+Here is an example of how the result will look:
+
+```sh
+Created account xxx:
+ path: /Users/mitrasish-personal/.spheron/xxxxxyx.json
+ address: 0x5C2432F3cB41927212e46e7224036d78eF3F2A93
+ secret: xxxxxxxxxx
+ mnemonic: xxxxxx xxxxx xxxx xxxxx xxxxx xxxx xxxxx xxxxx
+```
+
+Make sure to read the output carefully and save your mnemonic phrase and key secret in a secure location. 
+
+Once created, the wallet will be saved locally at `~/.spheron`. You can access the key-secret of the current wallet in `~/.spheron/config.json`. 
+The newly created wallet will automatically be set as the current wallet. If needed, you can change the wallet by following the instructions in the "Changing Your Wallet" section.
+
+### Importing a Wallet
+
+You can import a wallet from a JSON file:
+
+```sh
+sphnctl wallet import --name [Wallet Name] --private-key [Private Key] --key-secret [Key Secret]
+```
+
+**Example:**
+
+```sh
+sphnctl wallet import --name wallet --private-key xxxxxxxxxx --key-secret xxxxxxxxxx
+```
+
+<Callout type="info">
+**Note:** The private key shouldn't be in the format of `0x`. Once the import is done, the wallet will be set as the current wallet.
+</Callout>
+
+### Wallet Balance
+
+You can check the current balance the wallets you created in local:
+
+```sh
+sphnctl wallet balance
+```
+
+Here is an example of how the result will look:
+
+```sh
+Current ETH balance: [Balance]
+```
+
+### Checking the Current Wallet
+
+To see which wallet is currently in use for deployments, run the following command:
+
+```sh
+sphnctl wallet current
+```
+
+Here is an example of how the result will look:
+
+```sh
+Currently using account xxx:
+	path: /Users/mitrasish-personal/.spheron/abc.json
+	address: 0x2c11A76298A111B8cAASCCS205dc8f0A268ASCS
+	passphrase: testPaxxxx
+```
+
+### Changing Your Wallet
+
+If you need to switch to a different wallet, use the command below, providing the name and the key-secret of the new wallet:
+
+```sh
+sphnctl wallet use --name [Wallet Name] --key-secret [Key Secret]
+```
+
+**Example:**
+
+```sh
+sphnctl wallet use --name wallet --key-secret xxxxxxxxxx
+```
+
+Here is an example of how the result will look:
+
+```sh
+Switched default account to xxx:
+	path: /Users/mitrasish-personal/.spheron/acbv.json
+	address: 0x2c11A76298A111B8cAAvvvvvv05dc8f0A268ASCS
+	passphrase: test
+```
+This will update the current wallet to the specified one.
+
+### Export the Private Key of Wallet
+
+You can export your private key of the wallets you created in local and import it in metamask:
+
+```sh
+sphnctl wallet private-key
+```
+
+Here is an example of how the result will look:
+
+```sh
+Here is the private key of the wallet [address]:
+[Exported Private Key]
+```
+
+## Escrow Account Overview
+
+You need to fund your wallet with some ETH to deploy anything on Spheron. We are currently deployed on Base Mainnet chain, you can try getting some ETH from the base mainnet known faucets or buy it from the market to pay for the transaction fees.
+
+### Depositing Fund
+
+You need to deposit some minimum balance of any token to your account before doing any deployment. Any deployment on Spheron need user to deposit some amount of token that is used for the deployment otherwise the deployment will not start. To deposit a specific token like uSPON, you need to run this command:
+
+```sh
+sphnctl payment deposit --amount [Amount] --token [Token Name]
+```
+
+**Example:**
+
+```sh
+sphnctl payment deposit --amount 50 --token uSPON
+```
+
+Here is an example of how the result will look:
+
+```sh
+Successfully deposited [Amount] [Token Name]! Start deploying!!!
+Tx hash: https://arbiscan.io/tx/0xc33a13a0e5e07ca54fea6077f7d14052ac65cf36682983cc69eed16a162ab1f1
+```
+
+<Callout type="info">
+**Note:** There is a restriction on minimum amount of deposited funds in your account of any token to start any deployment. Refer [Supported Payment Tokens](/rent-gpu/supports#supported-payment-tokens) to see the minimum token requirement for deposit.
+</Callout>
+
+### Withdrawing Fund
+
+To withdraw a specific token, you need to run this command:
+
+```bash
+sphnctl payment withdraw --amount [Amount] --token [Token Name]
+```
+
+**Example:**
+
+```sh
+sphnctl payment withdraw --amount 50 --token uSPON
+```
+
+Here is an example of how the result will look:
+
+```bash
+Successfully withdrawn [Amount] [Token Name]! 
+Tx hash: https://basescan.org/tx/0xc33a13a0e5e07ca54fea6077f7d14052ac65cf36682983cc69eed16a162ab1f1
+
+If you want to deposit some other token, Please do this:
+sphnctl payment deposit --amount [Amount] --token [Token Name]
+```
+
+### Checking your Escrow Balance
+Check your account has sufficient balance by running:
+
+```sh
+sphnctl wallet balance --token [Token Name]
+```
+
+**Example:**
+
+```sh
+sphnctl wallet balance --token uSPON
+```
+
+Here is an example of how the result will look:
+
+```sh
+This is your current balance for this token [Token Name]:
+ Total: 443064994100000000
+
+Deposited uSPON balance
+ Unlocked: 22929459
+ Locked: 4164    
+```
+
+### Listing All the Payment Tokens
+To find all the payment tokens that are registered in Spheron Protocol, you need to run this command to fetch them:
+
+```sh
+sphnctl payment tokens
+```
+
+Here is an example of how the result will look:
+
+```sh
+Available tokens:
+Token: uSPON, Precision: 6, TokenAddress: 0x24A05B480235Ccb450bf7Ce7e9F65072Ed732292
+```
+
+## Setting Custom Base Mainnet RPC WSS URL
+
+To ensure reliable Base Mainnet deployments, you should supply your own dedicated base mainnet RPC endpoint. Public base mainnet RPCs are rate-limited and can lead to failed or stalled deployments under load.
+
+1. **Obtain a Custom RPC URL**
+
+Choose any popular provider and create a free API key:
+- Alchemy: https://www.alchemy.com/base
+- Infura: https://docs.metamask.io/services/reference/base/
+- QuickNode: https://www.quicknode.com/docs
+
+2. **Set the Custom Base Mainnet RPC WSS URL**
+
+To set a custom Base Mainnet RPC WSS URL, you need to run this command:
+
+```sh
+sphnctl set rpc wss://[RPC URL]
+```
+
+**Example:**
+
+```sh
+sphnctl set rpc wss://base-mainnet.g.alchemy.com/v2/your-api-key
+```
+
+<Callout type="info">
+**Note:** The RPC URL should be in the format of `wss://[RPC URL]`. You need to get the websocket URL from the RPC provider.
+</Callout>
+
+## Create your Configuration
+
+Create a deployment configuration **gpu.yaml** to deploy the `jupyter/minimal-notebook` for Jupyter Notebook container using ICL.
+
+You may use the sample deployment file as-is or modify it for your own needs as described in our ICL **(Infrastructure Composition Language)** documentation. A typical modification would be to reference your own image instead of our image.
+
+EXAMPLE CONFIGURATION:
+
+```sh
+cat > gpu.yml <<EOF
+---
+version: "2.0"
+
+services:
+  web:
+    image: jupyter/minimal-notebook:latest
+    expose:
+      - port: 8888
+        as: 8888
+        to:
+          - global: true
+    env:
+      - TEST=test
+    resources:
+      cpu:
+        units: 0.5
+      memory:
+        size: 1Gi
+      storage:
+        - size: 1Gi
+    price:
+      token: uSPON
+      amount: 1
+
+deployment:
+  duration: 1h
+  mode: provider
+  tiers:
+    - community
+  attributes:
+    region: us-east
+EOF
+```
+
+## Deployment Overview
+
+### Create your Deployment
+To deploy on Spheron, run:
+
+```sh
+sphnctl deployment create gpu.yml
+```
+
+<Callout type="info">
+**Note:** If you're using the default public RPC with the CLI, your deployment might fail due to high latency and dropped events on the public endpoint. We strongly recommend setting up a private RPC (you can create one for free on platforms like QuickNode, Infura, or Alchemy).
+
+If you proceed with the default public RPC, you'll see a warning message prompting you to switch to a private RPC for better reliability.
+
+Something like this will be shown:
+
+```sh
+WARNING: You are using the default RPC URL, which may lead to deployment issues.
+Please follow the documentation to obtain a custom base mainnet RPC URL: https://docs.spheron.com/rent-gpu/protocol-cli#setting-custom-base-mainnet-rpc-wss-url
+Enter your custom base mainnet RPC URL here (click enter to continue with default one):
+```
+</Callout>
+
+Here is an example of how the result will look:
+
+```sh
+Validating ICL configuration.
+ICL validated.
+Sending configuration for Fizz Node matching.
+Duration of the deployment: 1h 
+Checking token deposit balance
+Deposit balance is sufficient: 16.537042 uSPON   
+Deployment order created: 0x451e28ec9006601058f357617a9b3b55db2d0736143e67297708c20df467ae77
+Waiting for Provider to bid on the deployment order...
+Bid found. 
+Order matched successfully.
+Deployment created using wallet 0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8
+ Lid: 44
+ Provider: 0x6634d41cccBD1E1576Ed4c6226832521A66bF874
+ Agreed price per hour: 0.1232434
+Sending manifest to Provider...
+Deployment manifest sent, waiting for acknowledgment.
+Deployment is finished.
+```
+
+The `lid` we get from the deployment is called Lease ID. This is the identifier you need to use to access your deployment's logs and status.
+
+### Fetch Deployment Details
+To fetch your deployment / lease details, you need to run this command to fetch it:
+
+This will contain URL to access the deployment server, all the assigned ports and the URI to access it. With this you can check your deployment status.
+
+```sh
+sphnctl deployment get --lid [Lease ID] 
+```
+
+**Example:**
+
+```sh
+sphnctl deployment get --lid 44
+```
+
+Here is an example of how the result will look:
+
+```sh
+Deployment #106119:
+On-chain summary:
+  State: Matched
+  Price/hour: 0.005987447823663
+  Started: 2025-07-27T20:57:31Z
+  Gateway: 0xcbe31c8a8E1e1573A5D0cC40872e3D43D22e4D0f
+  Fizz: 0x0fde61c805a8c0cbb73cbd824ac8ab7cd47bbf6c
+Running services:
+  ollama-test
+    URIs: [http://67.220.70.94:20000]
+    Ports:
+      - 8080 → 20000 | https://dev-gateway-v2-bdpg-el.sphn.link
+    Replicas: 1/1 available, 1 ready
+    Host: 67.220.70.94
+    Region: dev-spheron
+```
+
+### Fetch Deployment Logs
+To fetch your deployment's logs, you need to run this command to fetch it:
+
+```sh
+sphnctl deployment logs --lid [Lease ID]
+```
+
+**Example:**
+
+```sh
+sphnctl deployment logs --lid 44 --follow
+```
+
+Here is an example of how the result will look:
+
+```
+Here is the logs for the Lease ID: 101
+
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] Entered start.sh with args: jupyter lab
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] Running hooks in: /usr/local/bin/start-notebook.d as uid: 1000 gid: 100
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] Done running hooks in: /usr/local/bin/start-notebook.d
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] Running hooks in: /usr/local/bin/before-notebook.d as uid: 1000 gid: 100
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] Done running hooks in: /usr/local/bin/before-notebook.d
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] Executing the command: jupyter lab
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] [I 2024-07-02 15:19:39.753 ServerApp] Package jupyterlab took 0.0000s to import
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] [I 2024-07-02 15:19:39.776 ServerApp] Package jupyter_lsp took 0.0222s to import
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] [W 2024-07-02 15:19:39.776 ServerApp] A _jupyter_server_extension_points function was not found in jupyter_lsp. Instead, a _jupyter_server_extension_paths function was found and will be used for now. This function name will be deprecated in future releases of Jupyter Server.
+...
+```
+
+### Startup Logs from Fizz Node
+
+<Callout type="warning">
+**Note:** The startup logs feature is only available in `fizz` mode. When using `provider` mode, startup logs cannot be accessed.
+</Callout>
+
+
+
+To view startup logs specifically from the fizz node, which can be crucial for troubleshooting deployment issues, use the following command:
+
+```sh
+sphnctl deployment logs --lid [Lease ID] --startup
+```
+
+**Example:**
+
+```sh
+sphnctl deployment logs --lid 44 --startup
+```
+
+This command will display logs from the initial startup of your deployment on the fizz node. These logs are particularly useful for identifying any issues that occur during the deployment process. Here's an example of what the output might look like:
+
+```
+Startup logs for Lease ID: 44
+
+[Fizz Node] Initializing deployment...
+[Fizz Node] Pulling container image: jupyter/minimal-notebook:latest
+[Fizz Node] Image pulled successfully
+[Fizz Node] Creating container...
+[Fizz Node] Container created successfully
+[Fizz Node] Starting container...
+[Fizz Node] Container started
+[Fizz Node] Applying network configurations...
+[Fizz Node] Network configurations applied
+[Fizz Node] Deployment startup complete
+```
+
+These startup logs can help developers quickly identify and resolve issues related to image pulling, container creation, network configuration, or any other startup-related problems.
+
+There are some other options that you can use to stream logs or change output format, etc. 
+
+### Other Options:
+| Option                                            | Default   | Description                                                                           |
+|---------------------------------------------------|-----------|---------------------------------------------------------------------------------------|
+| `-f, --follow`                                    |           | Follow log output (does not work with mode set to `fizz`)                             |
+| `-o, --output`      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| 'text'    | Output format `text | json`. Defaults to text (default "text")                        |
+| `-t, --tail`                                      | `all`     | The number of lines from the end of the logs to show. Defaults to `all`.              |
+| `--service`                                       | No        | Name of service you want specifically query the logs from.                            |
+| `--startup`                                       |           | Fetch log output from startup of the service container (only work with mode set to `fizz`) |
+
+
+
+### Fetch Deployment Events
+To fetch your deployment's events, you need to run this command to fetch it:
+
+```sh
+sphnctl deployment events --lid [Lease ID]
+```
+
+**Example:**
+
+```sh
+sphnctl deployment events --lid 44 --follow
+```
+
+Here is an example of how the result will look:
+
+```sh
+Here is the logs for the Lease ID: 101
+
+{
+  "type": "Normal",
+  "reportingController": "default-scheduler",
+  "reportingInstance": "default-scheduler-provider.devnetasphn.com",
+  "reason": "Scheduled",
+  "note": "Successfully assigned 48qqj898n07hat4i3gkjfufcnpmej2hssi2hd0tjk7ua6/web-65cc59bb99-bq78t to spheron-node2",
+  "object": {
+    "kind": "Pod",
+    "namespace": "48qqj898n07hat4i3gkjfufcnpmej2hssi2hd0tjk7ua6",
+    "name": "web-65cc59bb99-bq78t"
+  },
+  "lease_id": {
+    "owner": "0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8",
+    "dseq": 46,
+    "gseq": 1,
+    "oseq": 1,
+    "provider": "0x6634d41cccBD1E1576Ed4c6226832521A66bF874"
+  }
+}
+{
+  "type": "Normal",
+  "reportingController": "kubelet",
+  "reportingInstance": "spheron-node2",
+  "reason": "Pulled",
+  "note": "Container image \"jupyter/minimal-notebook:latest\" already present on machine",
+  "object": {
+    "kind": "Pod",
+    "namespace": "48qqj898n07hat4i3gkjfufcnpmej2hssi2hd0tjk7ua6",
+    "name": "web-65cc59bb99-bq78t"
+  },
+  "lease_id": {
+    "owner": "0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8",
+    "dseq": 46,
+    "gseq": 1,
+    "oseq": 1,
+    "provider": "0x6634d41cccBD1E1576Ed4c6226832521A66bF874"
+  }
+}
+....
+```
+
+There are some other options that you can use to stream events or change output format, etc. 
+
+### Other Options:
+
+| Option                                          | Default   | Description                                                                           |
+|-------------------------------------------------|-----------|---------------------------------------------------------------------------------------|
+| `-f, --follow`    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|           | Follow log output                                                                     |
+| `-t, --tail`                                    | 'all'     | The number of lines from the end of the logs to show. Defaults to 'all'.              |
+| `--service`                                     | No        | Name of service you want specifically query the logs from.                            |
+
+
+### Connect to Deployment Shell
+
+<Callout type="info">
+**Note:** The shell access feature is only available in `provider` mode. When using `fizz` mode, shell access cannot be accessed.
+</Callout>
+
+To connect to your deployment's shell access, you need to run this command to fetch it:
+
+```sh
+sphnctl deployment shell [Service_Name] [Command] --lid [Lease ID] --stdin --tty
+```
+
+**Example:**
+
+```sh
+sphnctl deployment shell web /bin/sh --lid 44 --stdin --tty
+```
+
+This will create a shell access to the service running on the instance. The service name can be found in the ICL yaml under services parameter.
+
+### Arguments:
+- **Service Name:** This is the name defined for your service in your ICL YAML file under the `services` parameter. You can connect to any service running in the deployment by specifying the service name in the shell command.
+- **Command:** This is the command you want to execute within the service of the deployment, such as `/bin/sh`.
+
+<Callout type="info">
+**NOTE:** If the service name or command you need to pass contains spaces, enclose the entire string in quotes. This ensures it is treated as a single argument.
+</Callout>
+
+### Other Options:
+
+| Option                                   | Mandatory          | Description                                                                                                                               |
+|------------------------------------------|--------------------|-------------------------------------------------------------------------------------------------------------------------------------------|
+| `--lid`                                  | Yes                | Lease ID of the deployment                                                                                                                |
+| `--stdin`                                | No                 | Connect stdin connection to the service                                                                                                   |
+| `--tty`                                  | No                 | Connect an interactive terminal to the deployment. If not passed, it will only log the result of the command sent.                        |
+| `--replica-index`&nbsp;&nbsp;&nbsp;&nbsp;| No                 | Replica index of the service in the instance to connect to if there are multiple of them otherwise not needed.                            |
+
+### SSH Access to Deployment
+
+You can access your deployment via SSH for more convenient management and advanced operations. This requires a few setup steps.
+
+#### Generate SSH Key Pair
+
+First, generate an SSH key pair on your local machine if you don't already have one:
+
+```sh
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+```
+
+Follow the prompts to save the key. By default, the keys will be saved in `~/.ssh/id_rsa` (private key) and `~/.ssh/id_rsa.pub` (public key).
+
+#### Create a Deployment with SSH Support
+
+Ensure your deployment uses an image that supports SSH access. You can reference SSH-compatible images like those in the Spheron Docker repository:
+
+```yaml
+version: "2.0"
+
+services:
+  pytorch-server:
+    image: spheronfdn/pytorch:latest
+    pull_policy: Always
+    expose:
+      - port: 22
+        as: 22
+        to:
+          - global: true
+    params:
+      storage:
+        default:
+          mount: /home/jovyan
+          readOnly: false
+    resources:
+      cpu:
+        units: 8
+      memory:
+        size: 16Gi
+      storage:
+        - name: "default"
+          size: 200Gi
+          attributes:
+            persistent: true
+            class: beta3
+      gpu:
+        units: 1
+        attributes:
+          vendor:
+            nvidia:
+              - model: rtx4090
+    price:
+      token: uSPON
+      amount: 1
+
+deployment:
+  duration: 1h
+  mode: provider
+
+```
+
+<Callout type="info">
+**NOTE:** Make sure to expose port 22 in your deployment configuration as shown above. This is essential for SSH access to work properly.
+</Callout>
+
+#### Set SSH Public Key for Deployment
+
+Add your public SSH key to the deployment:
+
+```sh
+sphnctl deployment ssh set-key [path-to-public-key]
+```
+
+**Example:**
+
+```sh
+sphnctl deployment ssh set-key ~/.ssh/id_rsa.pub
+```
+
+Here is an example of how the result will look:
+
+```sh
+Public key set successfully
+```
+
+#### Enable SSH for Your Deployment
+
+Make sure to wait for the deployment to be ready before setting the SSH key. Enable SSH access for a specific deployment:
+
+```sh
+sphnctl deployment ssh enable --lid [Lease ID]
+```
+
+**Example:**
+
+```sh
+sphnctl deployment ssh enable --lid 90
+```
+
+Here is an example of how the result will look:
+
+```sh
+Enabling SSH access to the deployment...
+User: root
+Deployment ID: 90
+Public Key: /Users/test.pub
+Waiting for deployment to be ready...
+Deployment is ready...
+SSH port: 32496
+SSH host: provider.thor.gpufarm.xyz
+Please use the following command to connect to the deployment:
+	ssh -i <private-key> -p 32496 root@provider.example.xyz
+```
+
+Once SSH is enabled, you can connect to your deployment using standard SSH commands:
+
+```sh
+ssh -i [PRIVATE_KEY] -p [PORT] [USER]@[HOST]
+```
+
+<Callout type="info">
+**NOTE:** SSH access requires that your deployment use an SSH-compatible image and that the provider supports SSH connections. Not all deployment configurations may support SSH access.
+
+Here are some of the images that we added support for SSH access and their templates:
+
+- [spheronfdn/pytorch:latest](https://github.com/spheronFdn/awesome-spheron/blob/main/pytorch/spheron.yaml)
+- [spheronfdn/tensorflow:latest](https://github.com/spheronFdn/awesome-spheron/blob/main/tensorflow/spheron.yaml)
+- [spheronfdn/cuda:12.3.1-devel-ubuntu22.04](https://github.com/spheronFdn/awesome-spheron/blob/main/nvidia-cuda-devel/spheron.yaml)
+- [spheronfdn/cuda:12.4.1-cudnn-devel-ubuntu22.04](https://github.com/spheronFdn/awesome-spheron/blob/main/nvidia-cudnn-devel/spheron.yaml)
+- [spheronfdn/ubuntu:22.04](https://github.com/spheronFdn/awesome-spheron/blob/main/ubuntu22/spheron.yaml)
+- [spheronfdn/ubuntu:24.04](https://github.com/spheronFdn/awesome-spheron/blob/main/ubuntu24/spheron.yaml)
+</Callout>
+
+### Update the Deployment
+Update the `deploy.yml` manifest file with the desired change.
+
+<Callout type="info">
+**NOTE:** Not all attributes of the manifest file are eligible for deployment update. If the ports are changed, a re-deployment of the workload is necessary. Other attributes, such as specs, deployment image and environment, are eligible for updates.
+</Callout>
+
+```sh
+sphnctl deployment update --lid [Lease ID] gpu.yml
+```
+
+**Example:**
+
+```sh
+sphnctl deployment update --lid 44 gpu.yml
+```
+
+Here is an example of how the result will look:
+
+```sh
+Checking ballance for wallet: 0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8
+Validating SDL configuration.
+SDL validated.
+Sending update request...
+Update request sent: [Tx Hash]
+Waiting for providers to accept on the update order...
+Update request accepted by the provider.
+Deployment update using wallet 0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8
+ lid: 26
+ provider: 0xe5CF265769039267c8FDbadd87f8a28B99769267
+ agreed price: 125304312995
+Sending the manifest for update…
+Deployment manifest sent, waiting for acknowledgment.
+Update deployment is finished.
+```
+
+<Callout type="info">
+**NOTE:**
+1. If you want to change the compute resources, a new agreed price will be provided by the provider. Please note that if the requested compute resources are not available, the provider can choose not to accept the update request. In that case, you can close the deployment and create a new one.
+2. There are some restrictions on what can be updated:
+    - Ports cannot be updated at runtime
+    - Region cannot be updated at runtime
+    - Tier cannot be updated at runtime
+    - Token cannot be updated at runtime
+</Callout>
+
+### Close Deployment
+Should you need to close the deployment follow this step.
+
+```sh
+sphnctl deployment close --lid [Lease ID]
+```
+
+**Example:**
+
+```sh
+sphnctl deployment close --lid 44
+```
+
+Here is an example of how the result will look:
+
+```sh
+Close request sent to provider: [Tx Hash]
+```
+
+### Get all the Deployment
+If you want to fetch all the leases you deployed till now using your current wallet.
+
+```sh
+sphnctl deployment list 
+```
+
+You can use the `- a` flag to filter the leases by active ones.
+
+```sh
+sphnctl deployment list -a
+```
+
+Here is an example of how the result will look:
+
+```sh
+   ID|                                    Provider|   State|             StartTime|
+  171|  0xb99E315d14653A7e2068b2764289e6F61755ebce|  Active|  2024-07-25T09:51:41Z|
+```
+<Callout type="info">
+**NOTE:** You can add `-a` flag to filter all the active leases on your wallet. Also note that if you change you wallet, all the leases will be different from what you used to see.
+</Callout>

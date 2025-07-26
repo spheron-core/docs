@@ -1,0 +1,43 @@
+import { Callout } from "nextra/components";
+import { Steps } from 'nextra/components'
+
+# Deploy Your Container on Spheron Playground
+
+This guide will walk you through the steps to deploy and access your application on Spheron Playground. Follow these steps carefully to ensure a successful deployment.
+
+<Steps>
+### Access the Spheron Console
+1. Visit [console.spheron.network](https://console.spheron.network)
+2. Log in to your account or create a new one if you haven't already
+3. Deposit some credits to your balance to pay for the deployment by clicking on the **Deposit** button in the top right corner.
+
+### Configure Your Deployment
+1. Navigate to the **Playground** tab
+2. You can directly deploy any ICL yaml on Spheron Playground. This is simplest way to deploy custom apps on Spheron.
+3. You can check all the example ICL yaml files in the [Awesome Spheron Repo](https://github.com/spheron-core/awesome-spheron). Or read more about ICL [here](/rent-gpu/icl).
+4. Make sure to check the token uSPON in the token section. This is the token you will use to pay for your deployment.
+5. Review your configuration and click **Start Deployment**
+6. Wait for deployment (typically under 60 seconds)
+
+### Access Your Deployment
+1. Go to the **Overview** tab once deployment is complete
+2. Locate your services and click on the service you want to access
+3. Click the provided connection URL corresponding to the port you want to access
+4. You can also access the deployment shell to run any command you want and deployment logs to check the status of your deployment
+</Steps>
+
+
+## Verification
+To verify GPU support:
+1. Run this command to check the GPU count in your deployment shell:
+```bash
+nvidia-smi
+```
+
+## Additional Tips
+- Save your work regularly on Github.
+- Monitor your memory usage carefully - if your notebook uses more memory than available (Out Of Memory/OOM), the server will automatically terminate and restart your notebook session, causing you to lose any unsaved work. You can check memory usage by running `nvidia-smi` in a notebook cell.
+- Your deployment environment is dedicated to you and not shared with other users, ensuring optimal performance for your workloads.
+
+
+Congratulations! Your app is now deployed and accessible. If you encounter any issues, reach out to [Spheron Discord Support](https://sphn.wiki/discord).

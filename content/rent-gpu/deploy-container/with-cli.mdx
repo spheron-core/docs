@@ -1,0 +1,392 @@
+import { Callout } from "nextra/components";
+import { Steps } from 'nextra/components'
+
+# Deploy Your Container on Spheron using CLI
+
+This guide will walk you through the steps to deploy and access your application on Spheron using CLI. Follow these steps carefully to ensure a successful deployment.
+
+<Steps>
+### Install Spheron Protocol `sphnctl` CLI (Linux, MacOS & Windows)
+
+1. To install Spheron Protocol CLI using script, make sure you have [`curl`](https://curl.se/) installed on your system. To check, quickly:
+
+```sh
+curl --version
+```
+
+2. To install the Spheron Protocol CLI on the system, just run this one command in your terminal and pass the password during the prompt:
+
+```sh
+curl -sL1 https://sphnctl.sh | bash
+```
+
+2. Verify Spheron Installation
+
+```sh
+# Verify the installation by using a simple command to check the Spheron version
+sphnctl version
+```
+
+### Create a new wallet using the CLI
+
+To create a new wallet, start by configuring the name of your key. Run the command below, replacing `[wallet name]` with a name of your choice:
+
+```sh
+sphnctl wallet create --name [wallet name]
+```
+
+Here is an example of how the result will look:
+
+```sh
+Created account xxx:
+ path: /Users/mitrasish-personal/.spheron/xxxxxyx.json
+ address: 0x5C2432F3cB41927212e46e7224036d78eF3F2A93
+ secret: xxxxxxxxxx
+ mnemonic: xxxxxx xxxxx xxxx xxxxx xxxxx xxxx xxxxx xxxxx
+```
+
+Make sure to read the output carefully and save your mnemonic phrase and key secret in a secure location. 
+
+Once created, the wallet will be saved locally at `~/.spheron`. You can access the key-secret of the current wallet in `~/.spheron/config.json`. 
+The newly created wallet will automatically be set as the current wallet. If needed, you can change the wallet by following the instructions in the [Changing Your Wallet](/rent-gpu/protocol-cli#changing-your-wallet) section.
+You can also export the private key of your newly generated wallet. Please follow the instructions given in [Export the Private Key of Wallet](/rent-gpu/protocol-cli#export-the-private-key-of-wallet).
+
+### Get uSPON tokens and ETH on Base Mainnet
+
+2. Then, get some uSPON tokens on the Base mainnet from the Spheron team and ask them to send it to your wallet address.
+
+3. Check if you got the uSPON tokens in your wallet:
+```
+sphnctl wallet balance --token uSPON
+```
+This will show both uSPON and ETH balances in your wallet.
+
+<Callout type="info">
+**Note:** 
+- You need to send ETH to your wallet address to pay for the gas fees.
+- You can get some credit token (uSPON) from the Spheron team if you are building something super amazing. Reach out to us on [Discord](https://sphn.wiki/discord) for that.
+- Make sure to mention what you are building and how you are using Spheron Protocol, which compute or GPU you want to use and the duration you want to use it for. And finally, mention the wallet address you want to get the tokens in.
+</Callout>
+
+### Deposit some token to Your Escrow Balance
+
+Depositing your tokens into the escrow is the first step to deploying your app on the Spheron Protocol. Ensure you have sufficient tokens in your escrow balance to lock the necessary funds for the deployment. Please follow the instructions below to proceed:
+
+1. Deposit uSPON to the escrow wallet:
+
+```
+sphnctl payment deposit --amount 10 --token uSPON
+```
+Here, the amount must be in the full precision of the token. To determine the precision of the token you are depositing, please refer to the [Supported Payment Tokens](/rent-gpu/supports#supported-payment-tokens) section.
+
+2. Now check if you have a balance in an unlocked state in your wallet:
+
+```
+sphnctl wallet balance --token uSPON
+```
+
+<Callout type="info">
+**Note:** You can withdraw tokens from your unlocked balance at any time. However, if the tokens are in a locked state, you will not be able to withdraw them until you close your deployment. Upon closing, the locked tokens will be returned to the unlocked state after deducting provider charges and protocol fees.
+</Callout>
+
+### Set the Custom Base Mainnet RPC WSS URL
+
+To ensure reliable Base Mainnet deployments, you should supply your own dedicated base mainnet RPC endpoint. Public base mainnet RPCs are rate-limited and can lead to failed or stalled deployments under load.
+
+1. **Obtain a Custom RPC URL**
+
+Choose any popular provider and create a free API key:
+- Alchemy: https://www.alchemy.com/base
+- Infura: https://docs.metamask.io/services/reference/base/
+- QuickNode: https://www.quicknode.com/docs
+
+2. **Set the Custom Base Mainnet RPC WSS URL**
+
+Before deploying, you should set the Dedicated Base Mainnet RPC WSS URL by running the following command:
+
+```sh
+sphnctl set rpc [private RPC URL]
+```
+
+**Example:**
+
+```sh
+sphnctl set rpc wss://base-mainnet.g.alchemy.com/v2/your-api-key
+```
+
+<Callout type="info">
+**Note:** The RPC URL should be in the format of `wss://[RPC URL]`. You need to get the websocket URL from the RPC provider.
+</Callout>
+
+### Deploy an app
+
+Now let's deploy an app to Spheron Protocol. Please follow the instructions below to proceed:
+
+**Important: Choosing Your Deployment Mode**
+
+Spheron offers two deployment modes:
+
+- **Provider Mode**: For stable, production-grade deployments with larger compute resources.
+- **Fizz Mode**: For cost-effective, distributed deployments suitable for testing or less resource-intensive applications.
+
+You can specify the mode in your ICL configuration under the `profiles` section. For example:
+
+```yaml
+profiles:
+  name: hello-world
+  duration: 1h
+  mode: provider  # or 'fizz' for Fizz Mode
+  tier:
+    - community
+  // ... other profile configurations ...
+```
+
+For this guide, we'll use Provider Mode. You may use the sample deployment file as-is or modify it for your own needs as described in our [ICL documentation](/rent-gpu/icl). A typical modification would be to reference your own image instead of our image.
+
+```sh
+cat > gpu.yml <<EOF
+---
+version: "2.0"
+
+services:
+  web:
+    image: jupyter/minimal-notebook:latest
+    expose:
+      - port: 8888
+        as: 8888
+        to:
+          - global: true
+    env:
+      - TEST=test
+    resources:
+      cpu:
+        units: 0.5
+      memory:
+        size: 1Gi
+      storage:
+        - size: 1Gi
+    price:
+      token: uSPON
+      amount: 1
+
+deployment:
+  duration: 1h
+  mode: provider # or 'fizz' for Fizz Mode
+EOF
+```
+
+3. Deploy the configuration on Spheron Protocol, run:
+
+```sh
+sphnctl deployment create gpu.yml
+```
+
+<Callout type="info">
+**Note:** If you're using the default public RPC with the CLI, your deployment might fail due to high latency and dropped events on the public endpoint. We strongly recommend setting up a private RPC (you can create one for free on platforms like QuickNode, Infura, or Alchemy).
+</Callout>
+
+If you proceed with the default public RPC, you'll see a warning message prompting you to switch to a private RPC for better reliability.
+Something like this will be shown:
+
+```sh
+WARNING: You are using the default RPC URL, which may lead to deployment issues.
+Please follow the documentation to obtain a custom base mainnet RPC URL: https://docs.spheron.com/rent-gpu/protocol-cli#setting-custom-base-mainnet-rpc-wss-url
+Enter your custom base mainnet RPC URL here (click enter to continue with default one):
+```
+
+Here is an example of how the result will look:
+
+```sh
+Checking ballance for wallet: 0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8
+Validating SDL configuration.
+SDL validated.
+Sending configuration for provider matching.
+Deployment order created: [Tx Hash]
+Waiting for providers to bid on the deployment order...
+Bid found.
+Order matched successfully.
+Deployment created using wallet 0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8
+ lid: 44
+ provider: 0x6634d41cccBD1E1576Ed4c6226832521A66bF874
+ agreed price: 158747943694
+Sending the manifest for deployment…
+Deployment manifest sent, waiting for acknowledgment.
+Deployment is finished.
+```
+
+The `lid` that we get from the deployment is called **Lease ID** & 44 is the Lease ID in this example. This is the identifier that you need to use to access your deployment's logs and status.
+
+### Access Your Deployment
+To access your deployment / lease details, you need to run this command to fetch it:
+
+This will contain URL to access the deployment server, all the assigned ports and the URI to access it. With this you can check your deployment status.
+
+```sh
+sphnctl deployment get --lid 44
+```
+
+Here is an example of how the result will look:
+
+```sh
+Status of the deployment ID: 44
+Deployment details:
+ Status:  Matched
+ Provider:  avaaaa
+ Price per hour:  1.21222
+ Start time:  2024-07-25T10:10:12Z
+
+Services running:
+  web
+    URL: []
+    Ports:
+      - provider.provider.devnetasphn.com:42100 -> 8888 (TCP)
+    Replicas: 1/1 available, 1 ready
+    Host URI: provider.devnetasphn.com
+    Region: us-east
+    IPs: []
+```
+
+### Fetching Deployment Logs
+
+To fetch your deployment logs, you need to use the Lease ID.
+
+```sh
+sphnctl deployment logs --lid 44
+```
+
+Here is an example of how the result will look:
+
+```sh
+Here is the logs for the Lease ID: 44
+
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] Entered start.sh with args: jupyter lab
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] Running hooks in: /usr/local/bin/start-notebook.d as uid: 1000 gid: 100
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] Done running hooks in: /usr/local/bin/start-notebook.d
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] Running hooks in: /usr/local/bin/before-notebook.d as uid: 1000 gid: 100
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] Done running hooks in: /usr/local/bin/before-notebook.d
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] Executing the command: jupyter lab
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] [I 2024-07-02 15:19:39.753 ServerApp] Package jupyterlab took 0.0000s to import
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] [I 2024-07-02 15:19:39.776 ServerApp] Package jupyter_lsp took 0.0222s to import
+[0x2c11A76298A111B8cA8Db82205dc8f0A2688e6e8/46/1/1/0x6634d41cccBD1E1576Ed4c6226832521A66bF874][web-65cc59bb99-bq78t] [W 2024-07-02 15:19:39.776 ServerApp] A _jupyter_server_extension_points function was not found in jupyter_lsp. Instead, a _jupyter_server_extension_paths function was found and will be used for now. This function name will be deprecated in future releases of Jupyter Server.
+...
+```
+
+### SSH Access to Deployment
+
+To access your deployment via SSH for more convenient management and advanced operations, follow these steps:
+
+1. **Generate SSH Key Pair (if you don't already have one)**
+
+   Generate an SSH key pair on your local machine:
+
+   ```sh
+   ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
+   ```
+
+   Follow the prompts to save the key. By default, the keys will be saved in `~/.ssh/id_rsa` (private key) and `~/.ssh/id_rsa.pub` (public key).
+
+2. **Create a Deployment with SSH Support**
+
+   Ensure your deployment uses an SSH-compatible image and exposes port 22. Here's an example configuration:
+
+   ```yaml
+   services:
+     pytorch-server:
+       image: spheronfdn/pytorch:latest
+       expose:
+         - port: 22
+           as: 22
+           to:
+             - global: true
+   ```
+
+3. **Set Your SSH Public Key**
+
+   Make sure to wait for the deployment to be ready before setting the SSH key. Add your public SSH key to be used with deployments:
+
+   ```sh
+   sphnctl deployment ssh set-key ~/.ssh/id_rsa.pub
+   ```
+
+   The result will show:
+   ```
+   Public key set successfully
+   ```
+
+4. **Enable SSH for Your Deployment**
+
+   Enable SSH access for your specific deployment:
+
+   ```sh
+   sphnctl deployment ssh enable --lid <LID>
+   ```
+
+   For example:
+   ```sh
+   sphnctl deployment ssh enable --lid 44
+   ```
+
+   The output will provide connection details:
+   ```
+   Enabling SSH access to the deployment...
+   User: root
+   Deployment ID: 44
+   Public Key: /Users/username/.ssh/id_rsa.pub
+   Waiting for deployment to be ready...
+   Deployment is ready...
+   SSH port: 32496
+   SSH host: provider.thor.gpufarm.xyz
+   Please use the following command to connect to the deployment:
+   	ssh -i <private-key> -p 32496 root@provider.thor.gpufarm.xyz
+   ```
+
+5. **Connect via SSH**
+
+   Use the provided command to connect to your deployment:
+
+   ```sh
+   ssh -i ~/.ssh/id_rsa -p 32496 root@provider.thor.gpufarm.xyz
+   ```
+
+<Callout type="info">
+**NOTE:** SSH access requires that your deployment use an SSH-compatible image and that the provider supports SSH connections. Some Spheron-supported images with SSH access include:
+
+- [spheronfdn/pytorch:latest](https://github.com/spheronFdn/awesome-spheron/blob/main/pytorch/spheron.yaml)
+- [spheronfdn/tensorflow:latest](https://github.com/spheronFdn/awesome-spheron/blob/main/tensorflow/spheron.yaml)
+- [spheronfdn/cuda:12.3.1-devel-ubuntu22.04](https://github.com/spheronFdn/awesome-spheron/blob/main/nvidia-cuda-devel/spheron.yaml)
+- [spheronfdn/cuda:12.4.1-cudnn-devel-ubuntu22.04](https://github.com/spheronFdn/awesome-spheron/blob/main/nvidia-cudnn-devel/spheron.yaml)
+- [spheronfdn/ubuntu:22.04](https://github.com/spheronFdn/awesome-spheron/blob/main/ubuntu22/spheron.yaml)
+- [spheronfdn/ubuntu:24.04](https://github.com/spheronFdn/awesome-spheron/blob/main/ubuntu24/spheron.yaml)
+</Callout>
+
+### Connect to the deployment shell
+
+To connect to the deployment shell, you need to run this command:
+
+```sh
+sphnctl deployment shell web /bin/sh --lid <LID> --stdin --tty 
+```
+
+Once you run this command, you will be connected to the shell of the deployment.
+
+You can now run any command you want to interact with your deployment. For example, you can check the GPU count by running:
+
+```sh
+nvidia-smi
+```
+
+</Steps>
+
+<Callout type="info">
+**NOTE:** If the service name or command you need to pass contains spaces, enclose the entire string in quotes. This ensures it is treated as a single argument.
+</Callout>
+
+
+You can retrieve various information from the deployment or interact with your deployment you just made, such as:
+- [Fetching the deployment logs](/rent-gpu/protocol-cli#fetch-deployment-logs)
+- [Fetching the deployment events](/rent-gpu/protocol-cli#fetch-deployment-events)
+- [Connecting to the deployment shell](/rent-gpu/protocol-cli#connect-to-deployment-shell)
+- [Updating your deployment](/rent-gpu/protocol-cli#update-the-deployment)
+- [Closing your deployment](/rent-gpu/protocol-cli#close-deployment)
+
+Congratulations! Your app is now deployed and accessible. If you encounter any issues, reach out to [Spheron Discord Support](https://sphn.wiki/discord).

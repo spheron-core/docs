@@ -211,15 +211,13 @@ cd spheron-stack/charts
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo add rook-release https://charts.rook.io/release
 helm repo add nvidia https://helm.ngc.nvidia.com/nvidia
-
 helm repo update
 
 kubectl create ns spheron-services
 kubectl label ns spheron-services spheron.network/name=spheron-services spheron.network=true
 kubectl create ns lease
 kubectl label ns lease spheron.network=true
-wget https://spheron-release.s3.us-east-1.amazonaws.com/v2/crd.yaml
-kubectl apply -f crd.yaml
+kubectl apply -f crd/crd.yaml
 ```
 
 ## Setup Ingress
@@ -343,18 +341,17 @@ Install the helm charts:
 ```sh
 sudo su spheron
 ```
+
 ```sh
 cd /home/spheron/spheron-stack/charts
-REGION=$(jq -r '.region' /home/spheron/.spheron/provider-config.json)
-DOMAIN=$(jq -r '.hostname' /home/spheron/.spheron/provider-config.json)
 helm upgrade --install spheron-provider ./spheron-provider -n spheron-services \
-        --set provider.walletPath=/spheron-key/wallet.json \
-        --set provider.walletSecret=testPassword \
-        --set provider.domain=$DOMAIN \
-        --set resources.limits.cpu="2" \
-        --set resources.limits.memory="2Gi" \
-        --set resources.requests.cpu="1" \
-        --set resources.requests.memory="1Gi"        
+  --set provider.walletPath=/spheron-key/wallet.json \
+  --set provider.walletSecret=testPassword \
+  --set resources.limits.cpu="2" \
+  --set resources.limits.memory="2Gi" \
+  --set resources.requests.cpu="1" \
+  --set resources.requests.memory="1Gi" 
+       
 ```
 
 ## Verify the node has GPU labels
@@ -558,9 +555,7 @@ You can also look up your provider on our [Provider Dashboard](https://provider.
 To upgrade the CLI binary and incorporate the latest updates, run the following commands:
 
 ```sh
-wget -O install.sh https://sphnctl.sh
-chmod +x install.sh
-./install.sh
+curl -sL1 https://sphnctl.sh/ | bash
 ```
 
 <Callout type="info">

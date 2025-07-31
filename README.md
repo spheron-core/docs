@@ -52,9 +52,9 @@ Follow these steps to setup the documentation locally:
 
 ## Contribution
 
-We encourage you to read the [contribution guidelines](https://github.com/spheron-core/docs/blob/main/.github/contribution-guidelines.md) to learn about our development process and how to propose bug fixes and improvements before submitting a pull request
+We encourage you to read the [contribution guidelines](https://github.com/spheron-core/docs/blob/main/.github/contribution-guidelines.md) to learn about our development process and how to propose bug fixes and improvements before submitting a pull request.
 
-The Spheron community extends beyond issues and pull requests! You can support Spheron [in many other ways](https://github.com/spheron-core/docs/blob/main/.github/support.md) as well
+The Spheron community extends beyond issues and pull requests! You can support Spheron [in many other ways](https://github.com/spheron-core/docs/blob/main/.github/support.md) as well.
 
 ## Community
 

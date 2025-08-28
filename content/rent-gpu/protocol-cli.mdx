@@ -55,9 +55,9 @@ Created account xxx:
  mnemonic: xxxxxx xxxxx xxxx xxxxx xxxxx xxxx xxxxx xxxxx
 ```
 
-Make sure to read the output carefully and save your mnemonic phrase and key secret in a secure location. 
+Make sure to read the output carefully and save your mnemonic phrase and wallet secret in a secure location. 
 
-Once created, the wallet will be saved locally at `~/.spheron`. You can access the key-secret of the current wallet in `~/.spheron/config.json`. 
+Once created, the wallet will be saved locally at `~/.spheron`. You can access the wallet-secret of the current wallet in `~/.spheron/config.json`. 
 The newly created wallet will automatically be set as the current wallet. If needed, you can change the wallet by following the instructions in the "Changing Your Wallet" section.
 
 ### Importing a Wallet
@@ -65,13 +65,13 @@ The newly created wallet will automatically be set as the current wallet. If nee
 You can import a wallet from a JSON file:
 
 ```sh
-sphnctl wallet import --name [Wallet Name] --private-key [Private Key] --key-secret [Key Secret]
+sphnctl wallet import --name [Wallet Name] --private-key [Private Key] --wallet-secret [Wallet Secret]
 ```
 
 **Example:**
 
 ```sh
-sphnctl wallet import --name wallet --private-key xxxxxxxxxx --key-secret xxxxxxxxxx
+sphnctl wallet import --name wallet --private-key xxxxxxxxxx --wallet-secret xxxxxxxxxx
 ```
 
 <Callout type="info">
@@ -111,16 +111,16 @@ Currently using account xxx:
 
 ### Changing Your Wallet
 
-If you need to switch to a different wallet, use the command below, providing the name and the key-secret of the new wallet:
+If you need to switch to a different wallet, use the command below, providing the name and the wallet-secret of the new wallet:
 
 ```sh
-sphnctl wallet use --name [Wallet Name] --key-secret [Key Secret]
+sphnctl wallet use --name [Wallet Name] --wallet-secret [Wallet Secret]
 ```
 
 **Example:**
 
 ```sh
-sphnctl wallet use --name wallet --key-secret xxxxxxxxxx
+sphnctl wallet use --name wallet --wallet-secret xxxxxxxxxx
 ```
 
 Here is an example of how the result will look:

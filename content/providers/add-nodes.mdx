@@ -16,16 +16,16 @@ To add a CPU node to your Spheron cluster, follow these steps:
 #### 1. Prepare a node for the installation using Ansible from the [earlier step](/providers/setup-provider).
 #### 2. Clone the Provider Deployment Repository
 
-If you haven't already, clone the Spheron provider deployment repository: [spheron-core/provider-deployment](https://github.com/spheron-core/provider-deployment)
+If you haven't already, clone the Spheron provider deployment repository: [spheron-core/provider-installation](https://github.com/spheron-core/provider-installation)
 
 ```
-git clone https://github.com/spheron-core/provider-deployment.git
+git clone https://github.com/spheron-core/provider-installation.git
 ```
 
 Repo has the following file structure: 
 
 <FileTree>
-  <FileTree.Folder name="provider-deployment" defaultOpen>
+  <FileTree.Folder name="provider-installation" defaultOpen>
     <FileTree.File name="README.md" />
     <FileTree.Folder name="playbook" defaultOpen>
       <FileTree.File name="Readme.md" />
@@ -80,7 +80,7 @@ sudo su spheron
 cd
 ```
 ```
-wget -q https://raw.githubusercontent.com/spheron-core/provider-deployment/main/scripts/add-agent.sh
+wget -q https://raw.githubusercontent.com/spheron-core/provider-installation/main/scripts/add-agent.sh
 ```
 
 - Use Vim or Nano to edit the `add-agent.sh` script. Update the master node IP and add child node IPs:
@@ -116,15 +116,15 @@ To add a GPU node to your Spheron cluster, follow these steps:
 #### 1. Prepare a node for the installation using Ansible from the [earlier step](/providers/setup-ansible).
 #### 2. Clone the Provider Deployment Repository
 
-If you haven't already, clone the Spheron provider deployment repository: [spheron-core/provider-deployment](https://github.com/spheron-core/provider-deployment)
+If you haven't already, clone the Spheron provider deployment repository: [spheron-core/provider-installation](https://github.com/spheron-core/provider-installation)
 
 ```
-git clone https://github.com/spheron-core/provider-deployment.git
+git clone https://github.com/spheron-core/provider-installation.git
 ```
 
 Repo has the following file structure: 
 <FileTree>
-  <FileTree.Folder name="provider-deployment" defaultOpen>
+  <FileTree.Folder name="provider-installation" defaultOpen>
     <FileTree.File name="README.md" />
     <FileTree.Folder name="playbook" defaultOpen>
       <FileTree.File name="Readme.md" />
@@ -181,7 +181,7 @@ sudo su spheron
 cd
 ```
 ```
-wget -q https://raw.githubusercontent.com/spheron-core/provider-deployment/main/scripts/add-agent.sh
+wget -q https://raw.githubusercontent.com/spheron-core/provider-installation/main/scripts/add-agent.sh
 ```
 
 - Use Vim or Nano editor to edit the `add-agent.sh` script. Update the master node IP and add child node IPs:
